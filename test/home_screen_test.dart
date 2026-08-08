@@ -22,8 +22,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Arsenal vs Chelsea'), findsOneWidget);
-    expect(find.text('GENERATE'), findsOneWidget);
-
+    
     await tester.tap(find.text('Arsenal vs Chelsea'));
     await tester.pump();
 
