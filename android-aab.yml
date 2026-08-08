@@ -1,0 +1,99 @@
+name: Android AAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "pubspec.yaml"
+      - "android/**"
+      - "assets/**"
+      - "scripts/**"
+      - ".github/workflows/android-aab.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repository sanity
+        run: |
+          chmod +x scripts/repo_sanity.sh
+          scripts/repo_sanity.sh
+
+      - name: Static preflight
+        run: |
+          chmod +x scripts/preflight.sh
+          scripts/preflight.sh
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Flutter stable from official repo
+        shell: bash
+        run: |
+          git clone --depth 1 --branch stable https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+          "$HOME/flutter/bin/flutter" --version
+
+      - name: Bootstrap Android platform
+        run: |
+          chmod +x scripts/bootstrap_android.sh
+          scripts/bootstrap_android.sh
+
+      - name: Configure signing when secrets exist
+        env:
+          KICKLUCK_KEYSTORE_B64: ${{ secrets.KICKLUCK_KEYSTORE_B64 }}
+          KICKLUCK_STORE_PASSWORD: ${{ secrets.KICKLUCK_STORE_PASSWORD }}
+          KICKLUCK_KEY_PASSWORD: ${{ secrets.KICKLUCK_KEY_PASSWORD }}
+          KICKLUCK_KEY_ALIAS: ${{ secrets.KICKLUCK_KEY_ALIAS }}
+        run: |
+          chmod +x scripts/configure_signing.sh
+          scripts/configure_signing.sh
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+
+      - name: Generate native splash
+        run: dart run flutter_native_splash:create
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build release AAB
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          if [[ -z "${API_FOOTBALL_KEY}" ]]; then
+            echo "API_FOOTBALL_KEY repository secret is required."
+            exit 1
+          fi
+          flutter build appbundle \
+            --release \
+            --dart-define=API_FOOTBALL_KEY="${API_FOOTBALL_KEY}"
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kickluck-android-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
