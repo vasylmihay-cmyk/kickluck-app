@@ -1,0 +1,11 @@
+{
+  "application_id": "com.kickluck.app",
+  "app_name": "KickLuck",
+  "version_name": "0.7.0",
+  "version_code": 7,
+  "category_candidate": "Sports",
+  "short_description": "Pick real football matches. Let luck choose the scenario.",
+  "release_track": "Internal testing",
+  "tester_limit_note": "Google Play internal testing supports up to 100 testers.",
+  "target_api_note": "Verify target API 35+ before upload under current Google Play requirements."
+}
