@@ -36,4 +36,27 @@ void main() {
     expect(items.single.id, 'saved_test');
     expect(items.single.picks.single.outcome, '1');
   });
+
+  test('clear removes all saved combinations', () async {
+    final repo = SavedRepository();
+    final item = SavedCombination(
+      id: 'saved_clear_test',
+      createdAt: DateTime(2026, 8, 9, 9),
+      picks: [
+        GeneratedPick(
+          fixture: mockFixtures.first,
+          mode: GenerationMode.oneXTwo,
+          outcome: '1',
+        ),
+      ],
+    );
+
+    await repo.save(item);
+    expect(await repo.getAll(), hasLength(1));
+
+    await repo.clear();
+
+    expect(await repo.getAll(), isEmpty);
+  });
+
 }

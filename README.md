@@ -1,4 +1,4 @@
-# KickLuck MVP — Milestone 10
+# KickLuck MVP — v0.9.1
 
 GitHub-ready CI release candidate.
 
@@ -10,6 +10,9 @@ GitHub-ready CI release candidate.
 - Saved Picks
 - History
 - Settings
+- Theme and language preferences
+- Responsible-use, privacy and terms screens
+- Clear History and Saved Picks controls
 - Share image
 - Real fixtures repository adapter
 - Fixture cache

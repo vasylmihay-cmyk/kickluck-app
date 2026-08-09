@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../generator/domain/generation_mode.dart';
 import '../data/saved_repository.dart';
 import '../domain/saved_combination.dart';
@@ -30,6 +31,30 @@ class _SavedScreenState extends State<SavedScreen> {
     setState(_reload);
   }
 
+  Future<void> _clearAll() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Saved Picks?'),
+        content: const Text('All saved combinations will be removed. This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await _repo.clear();
+    if (!mounted) return;
+    setState(_reload);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,6 +63,13 @@ class _SavedScreenState extends State<SavedScreen> {
           'Saved Picks',
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Clear Saved Picks',
+            onPressed: _clearAll,
+            icon: const Icon(Icons.delete_sweep_outlined),
+          ),
+        ],
         backgroundColor: Colors.transparent,
       ),
       body: FutureBuilder<List<SavedCombination>>(
@@ -74,6 +106,14 @@ class _SavedScreenState extends State<SavedScreen> {
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      DateFormat('dd MMM yyyy · HH:mm').format(item.createdAt.toLocal()),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .55),
+                        fontSize: 12,
                       ),
                     ),
                     const SizedBox(height: 8),

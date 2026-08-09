@@ -1,11 +1,21 @@
 {
   "project": "KickLuck",
   "milestone": 10,
-  "status": "GitHub-ready CI release candidate",
+  "status": "KickLuck v0.9.1 feature-complete CI candidate",
   "application_id": "com.kickluck.app",
   "flutter_local_build_performed": false,
   "reason": "Flutter/Dart SDK not installed in current execution environment",
   "next_authoritative_validation": "GitHub Actions Android AAB workflow",
   "required_first_secret": "API_FOOTBALL_KEY",
-  "workflow": ".github/workflows/android-aab.yml"
+  "workflow": ".github/workflows/android-aab.yml",
+  "version": "0.9.1+10",
+  "features_added": [
+    "Theme preference",
+    "Language preference",
+    "Clear History and Saved Picks",
+    "Responsible use, Privacy Policy and Terms of Use",
+    "About and Contact / Feedback",
+    "History timestamps",
+    "Saved Picks timestamps and clear-all action"
+  ]
 }

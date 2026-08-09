@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../data/history_repository.dart';
 import '../domain/history_entry.dart';
 
@@ -24,7 +25,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _clear() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear history?'),
+        content: const Text('All generation history will be removed. Saved Picks will remain.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
     await _repo.clear();
+    if (!mounted) return;
     setState(_reload);
   }
 
@@ -101,7 +121,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           Text(
                             '${item.matchCount} matches · ${item.modeLabel}',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: .65),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .65),
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            DateFormat('dd MMM yyyy · HH:mm').format(item.timestamp.toLocal()),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .48),
+                              fontSize: 12,
                             ),
                           ),
                         ],
